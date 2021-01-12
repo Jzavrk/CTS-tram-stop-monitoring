@@ -1,9 +1,9 @@
-#CTS-tram-stop-monitoring
+# CTS-tram-stop-monitoring
 
 Affichage des horaires à venir de tram en transit d'une station donnée au moyen
 d'un raspberry pi.
 
-##Prérequis
+## Prérequis
 
  * Un écran LCD rattaché à un module I2C.
 
@@ -14,7 +14,7 @@ d'un raspberry pi.
    [CTS](https://api.cts-strasbourg.eu/index.html)
  * Connexion internet, cables, éléctricité, …
 
-##Usage
+## Usage
 
 Activé le module kernel i2c avec `raspi-config`. Le bus i2c étant disponible,
 son identifient est **0** pour le raspberry pi 1 et **1** pour les versions
