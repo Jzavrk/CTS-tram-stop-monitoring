@@ -24,7 +24,12 @@ directement sur l'API de la CTS.
 
 Exemple d'utilisation:
 
-	./main.py -i 0x3f --station 275A QWxhZGRpbjpvcGVuIHNlc2FtZQo=
+	./main.py -i 0x3f --station 275A QWxhZGRpbjpvcGVuIHNlc2FtZQo= &
+
+Un fichier de log est créé (par défaut main.py.log) pour informer les 
+éventuelles problêmes.
+
+Le script s'arrête proprement à la reception du signal SIGINT, SIGTERM et
+SIGHUP.
 
 Pour faire démarrer le script au démarrage du rpi, utilisez cron.
-
