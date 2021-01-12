@@ -3,6 +3,12 @@
 Affichage des horaires à venir de tram en transit d'une station donnée au moyen
 d'un raspberry pi.
 
+## Dépendences:
+
+ * python3-requests
+ * python3-smbus
+ * i2c-tools (optionnel)
+
 ## Prérequis
 
  * Un écran LCD rattaché à un module I2C.
@@ -26,10 +32,10 @@ Exemple d'utilisation:
 
 	./main.py -i 0x3f --station 275A QWxhZGRpbjpvcGVuIHNlc2FtZQo= &
 
-Un fichier de log est créé (par défaut main.py.log) pour informer les 
-éventuelles problêmes.
+Un fichier de log est créé (par défaut main.py.log) pour informer des 
+éventuelles problèmes.
 
-Le script s'arrête proprement à la reception du signal SIGINT, SIGTERM et
+Le script s'arrête proprement à la reception du signal SIGINT, SIGTERM ou
 SIGHUP.
 
 Pour faire démarrer le script au démarrage du rpi, utilisez cron.
