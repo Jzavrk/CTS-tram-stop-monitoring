@@ -3,7 +3,7 @@
 Affichage des horaires à venir de tram en transit d'une station donnée au moyen
 d'un raspberry pi.
 
-## Dépendences:
+## Dépendances
 
  * python3-requests
  * python3-smbus
