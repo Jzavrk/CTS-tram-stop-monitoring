@@ -22,11 +22,13 @@ d'un raspberry pi.
 
 ## Usage
 
-Activé le module kernel i2c avec `raspi-config`. Le bus i2c étant disponible,
-son identifient est **0** pour le raspberry pi 1 et **1** pour les versions
-supérieurs.  Il faudra connaitre l'adresse du module i2c en utilisant la 
-commande `i2cdetect -y 1`. Enfin, la reférence de la station est consultable
-directement sur l'API de la CTS.
+Ecran connecté aux pins I2C apropriés, activez le module kernel I2C à l'aide
+de `raspi-config`. 
+Il faudra connaitre le numéro de bus et l'adresse du module I2C.
+Le numéro de bus pour le Raspberry Pi 1 est 0, 1 pour les autres.
+Pour connaitre l'adresse du module, utilisez la commande `i2cdetect -y 1` où
+1 represente le numéro de bus.
+La reférence de la station est consultable depuis l'API de la CTS.
 
 Exemple d'utilisation:
 
@@ -34,8 +36,8 @@ Exemple d'utilisation:
 
 Un fichier de log est créé (par défaut main.py.log) pour informer des 
 éventuelles problèmes.
-
 Le script s'arrête proprement à la reception du signal SIGINT, SIGTERM ou
 SIGHUP.
-
 Pour faire démarrer le script au démarrage du rpi, utilisez cron.
+
+Programme testé sur Raspberry Pi 3 Model B.
