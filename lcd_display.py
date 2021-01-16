@@ -6,6 +6,7 @@ autre taille en apportant de légères modifications.
 """
 
 from datetime import datetime, timedelta
+import sys
 import logging
 import threading
 import rpi_i2c_lcd
@@ -63,11 +64,17 @@ class DisplayThr(threading.Thread):
     def __init__(self, shared, stop_event, seconds_per_frame, i2c_addr,
             i2c_bus):
         threading.Thread.__init__(self)
-        self.display = rpi_i2c_lcd.LiquidCrystalI2C(i2c_addr, i2c_bus)
         self.logger = logging.getLogger(__name__)
         self.shared = shared
         self.stop_event = stop_event
         self.seconds_per_frame = seconds_per_frame
+        try:
+            self.display = rpi_i2c_lcd.LiquidCrystalI2C(i2c_addr, i2c_bus)
+        except OSError:
+            self.logger.exception('Unconnected device.', exc_info=False)
+            self.stop_event.set()
+            sys.exit()
+
 
     def run(self):
         local_list = []
@@ -79,7 +86,7 @@ class DisplayThr(threading.Thread):
             with self.shared.lock:
                 shared_data.copy_list(shared_list, local_list)
 
-            # Filtrage pour retenir que les horaires valides (valeurs
+            # Filtrage pour ne retenir que les horaires valides (valeurs
             # positives)
             i = 0
             for itr in local_list:
@@ -92,7 +99,6 @@ class DisplayThr(threading.Thread):
                         filt_list.append((itr.line_ref, min_left))
                     finally:
                         i = i + 1
-
             try:
                 if i == 0:
                     display_idle(self.display)
@@ -102,10 +108,9 @@ class DisplayThr(threading.Thread):
                     filt_list.sort(key=lambda tram: tram[1])
                     display_infos(self.display, local_list[0].station,
                             filt_list, i)
-
             except OSError:
                 self.logger.exception('Connection error. Abort.',
-                        exc_info=True)
+                        exc_info=False)
                 self.stop_event.set()
                 break
 
