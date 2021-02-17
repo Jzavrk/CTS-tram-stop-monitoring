@@ -12,7 +12,7 @@ import requests
 import shared_data
 
 MIN_DELAY = 8           # Temps minimum avant une nouvelle requête.
-FETCH_DELAY = 30 * 60   # Temps d'attente arbitraire si plus de tram.
+FETCH_DELAY = 3 * 60    # Temps d'attente arbitraire si plus de tram.
 
 URL = "https://api.cts-strasbourg.eu/v1/siri/2.0/stop-monitoring"
 
@@ -59,7 +59,8 @@ class InfosThr(threading.Thread):
             except requests.exceptions.HTTPError as http_error:
                 self.logger.exception('Request error %d.', req.status_code,
                         exc_info=False)
-                raise requests.exceptions.ConnectionError from http_error
+                if self.stop_event.wait(timeout=MIN_DELAY):
+                    break
 
             # Si erreur, alors retentative jusqu'à 5 fois.
             except requests.exceptions.ConnectionError:
