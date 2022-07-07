@@ -8,6 +8,8 @@ autres threads.
 from datetime import datetime, timedelta
 import threading
 import logging
+import re
+
 import requests
 import shared_data
 
@@ -71,18 +73,21 @@ class InfosThr(threading.Thread):
                     req_try = req_try + 1
                     self.stop_event.wait(timeout=MIN_DELAY)
                     continue
-
-                self.logger.exception('Hanging up.', exc_info=False)
-                self.stop_event.set()
-                break
+                else:
+                    self.logger.exception('Hanging up.', exc_info=False)
+                    self.stop_event.set()
+                    break
 
             data = req.json()
 
+            # Remove UTC offset at the end of string.
+            valid_until_str = re.sub(r"^(.*)(\+|\-).*", r"\1",
+                    (data['ServiceDelivery']['StopMonitoringDelivery'][0]
+                    ['ValidUntil']), flags=re.ASCII)
+
             # Secondes restantes pour une nouvelle requête
             valid_cntdown = timedelta.total_seconds(datetime.strptime(
-                (data['ServiceDelivery']['StopMonitoringDelivery'][0]
-                    ['ValidUntil']), '%Y-%m-%dT%H:%M:%S+01:00')
-                - datetime.now())
+                    valid_until_str, '%Y-%m-%dT%H:%M:%S') - datetime.now())
 
             # Tableau comprenant noms de ligne et heures d'arrivées.
             # Si une exception est levée, plus aucun tram n'est
@@ -99,9 +104,11 @@ class InfosThr(threading.Thread):
 
             # Remplissage tableau.
             for i, val in enumerate(tram_infos):
-                arrival_time = datetime.strptime(
+                # Remove UTC offset at the end of string.
+                valid_until_str = re.sub(r"^(.*)(\+|\-).*", r"\1",
                         (val['MonitoredVehicleJourney']['MonitoredCall']
-                        ['ExpectedArrivalTime']), '%Y-%m-%dT%H:%M:%S+01:00')
+                            ['ExpectedArrivalTime']), flags=re.ASCII)
+                arrival_time = datetime.strptime(valid_until_str , '%Y-%m-%dT%H:%M:%S')
                 line_ref = val['MonitoredVehicleJourney']['LineRef']
                 destination = (val['MonitoredVehicleJourney']
                         ['DestinationShortName'])
