@@ -26,26 +26,24 @@ def display_idle(display):
 
 
 # A MODIFIER POUR ÉCRAN DIFFÉRENT
-def display_infos(display, station_name, info_list, valid_num):
-    """Affichage des arrivées de tram à la station station_name.
-
-    Arguments:
-        display: LiquidCrystalI2C
-        station_name: str
-        info_list: liste de tuple (nom_de_ligne, minute_restantes)
-        valid_num: nombre de cellule valide dans la liste
-    """
+def display_header(display, station_name):
+    """Affichage nom de station et heure."""
     display.display_string("{:10.10} {:%H:%M}".format(
         station_name, datetime.now()), 1)
 
-    if valid_num == 1:
-        display.display_string("{}:{:3}m".format(
-            info_list[0][0], info_list[0][1])
-            + " " * 10, 2)
-    else:
-        display.display_string("{}:{:3}m    {}:{:3}m".format(
-            info_list[0][0], info_list[0][1],
-            info_list[1][0], info_list[1][1]), 2)
+
+def display_one_tramway(display, info_list):
+    """Affichage temps restant pour un tram."""
+    display.display_string("{}:{:3}m".format(
+        info_list[0][0], info_list[0][1])
+        + " " * 10, 2)
+
+
+def display_two_tramways(display, info_list):
+    """Affichage temps restant pour deux trams."""
+    display.display_string("{}:{:3}m    {}:{:3}m".format(
+        info_list[0][0], info_list[0][1],
+        info_list[1][0], info_list[1][1]), 2)
 
 
 class DisplayThr(threading.Thread):
@@ -106,8 +104,12 @@ class DisplayThr(threading.Thread):
                 else:
                     # Tri de précaution, garantit stable
                     filt_list.sort(key=lambda tram: tram[1])
-                    display_infos(self.display, local_list[0].station,
-                            filt_list, i)
+                    display_header(self.display, local_list[0].station)
+                    if i == 1:
+                        display_one_tramway(self.display, filt_list)
+                    else:
+                        display_two_tramways(self.display, filt_list)
+
             except OSError:
                 self.logger.exception('Connection error. Abort.',
                         exc_info=False)
