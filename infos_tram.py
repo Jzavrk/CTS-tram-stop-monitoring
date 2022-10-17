@@ -14,7 +14,7 @@ import requests
 import shared_data
 
 MIN_DELAY = 8           # Temps minimum avant une nouvelle requête.
-FETCH_DELAY = 3 * 60    # Temps d'attente arbitraire si plus de tram.
+FETCH_DELAY = 5 * 60 * 60   # Temps d'attente arbitraire si plus de tram.
 
 URL = "https://api.cts-strasbourg.eu/v1/siri/2.0/stop-monitoring"
 
@@ -48,6 +48,7 @@ class InfosThr(threading.Thread):
         local_list = []
         shared_list = self.shared.list
         req_try = 0
+        req = None
 
         while True:
             try:
@@ -58,7 +59,7 @@ class InfosThr(threading.Thread):
                 else:
                     req.raise_for_status()
 
-            except requests.exceptions.HTTPError as http_error:
+            except requests.exceptions.HTTPError:
                 self.logger.exception('Request error %d.', req.status_code,
                         exc_info=False)
                 if self.stop_event.wait(timeout=MIN_DELAY):
@@ -69,6 +70,7 @@ class InfosThr(threading.Thread):
                 self.logger.exception('Connection issue. Attempt %d.', req_try,
                         exc_info=False)
 
+                # WARNING: Hardcoded value
                 if req_try < 4:
                     req_try = req_try + 1
                     self.stop_event.wait(timeout=MIN_DELAY)
