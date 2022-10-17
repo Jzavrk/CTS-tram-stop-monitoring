@@ -66,7 +66,7 @@ class InfosThr(threading.Thread):
 
             # Si erreur, alors retentative jusqu'à 5 fois.
             except requests.exceptions.ConnectionError:
-                self.logger.exception('Connection issue. Try %d.', req_try,
+                self.logger.exception('Connection issue. Attempt %d.', req_try,
                         exc_info=False)
 
                 if req_try < 4:
