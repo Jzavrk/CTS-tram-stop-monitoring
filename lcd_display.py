@@ -11,6 +11,7 @@ import logging
 import threading
 import rpi_i2c_lcd
 import shared_data
+import lcd_animations as anim
 
 
 def minutes_left(arrival_time):
@@ -20,9 +21,15 @@ def minutes_left(arrival_time):
 
 # A MODIFIER POUR ÉCRAN DIFFÉRENT
 def display_idle(display):
-    """Affichage d'un message d'attente."""
-    display.display_string("Fetching..." + " " * 5, 1)
-    display.display_string(" " * 16, 2)
+    display.clear()
+    display.write_char(0)
+    display.write_char(1)
+    display.write_char(2)
+    display.write_char(3)
+    display.set_cursor_at(0x40)
+    display.write_char(4)
+    display.write_char(5)
+    display.write_char(6)
 
 
 # A MODIFIER POUR ÉCRAN DIFFÉRENT
@@ -78,6 +85,8 @@ class DisplayThr(threading.Thread):
         local_list = []
         shared_list = self.shared.list
         filt_list = [] # Tableau de tuples (nom_de_ligne, minutes_restantes)
+
+        self.display.load_custom_chars(anim.dinosaure)
 
         while True:
             # Copie des données partagées
