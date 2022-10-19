@@ -15,7 +15,9 @@ import shared_data
 
 MIN_DELAY = 8           # Temps minimum avant une nouvelle requête.
 FETCH_DELAY = 5 * 60 * 60   # Temps d'attente arbitraire si plus de tram.
-
+ATTEMPT_DELAY = 14      # Temps d'attente pour une requête non concluante.
+MAX_ATTEMPT = 4         # Nb d'essai avant exit
+    
 URL = "https://api.cts-strasbourg.eu/v1/siri/2.0/stop-monitoring"
 
 
@@ -67,13 +69,12 @@ class InfosThr(threading.Thread):
 
             # Si erreur, alors retentative jusqu'à 5 fois.
             except requests.exceptions.ConnectionError:
-                self.logger.exception('Connection issue. Attempt %d.', req_try,
+                self.logger.exception('Connection error. Attempt %d.', req_try,
                         exc_info=False)
 
-                # WARNING: Hardcoded value
-                if req_try < 4:
+                if req_try < MAX_ATTEMPT:
                     req_try = req_try + 1
-                    self.stop_event.wait(timeout=MIN_DELAY)
+                    self.stop_event.wait(timeout=ATTEMPT_DELAY)
                     continue
                 else:
                     self.logger.exception('Hanging up.', exc_info=False)
