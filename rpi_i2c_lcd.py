@@ -233,3 +233,8 @@ class LiquidCrystalI2C:
         for char in fontdata:
             for line in char:
                 self.write_char(line)
+
+    def load_single_custom_char(self, index, fontdata):
+        self.write_cmd(SETCGRAMADDR | (index * 8))
+        for line in fontdata:
+            self.write_char(line)

@@ -21,16 +21,10 @@ def minutes_left(arrival_time):
 
 
 # A MODIFIER POUR ÉCRAN DIFFÉRENT
-def display_idle(display):
+def display_idle(display, animation):
     display.clear()
-    display.write_char(0)
-    display.write_char(1)
-    display.write_char(2)
-    display.write_char(3)
-    display.set_cursor_at(0x40)
-    display.write_char(4)
-    display.write_char(5)
-    display.write_char(6)
+    animation.prepare()
+    animation.play(0.4)
 
 
 # A MODIFIER POUR ÉCRAN DIFFÉRENT
@@ -84,7 +78,7 @@ class DisplayThr(threading.Thread):
         shared_list = self.shared.list
         filt_list = [] # Tableau de tuples (nom_de_ligne, minutes_restantes)
 
-        self.display.load_custom_chars(anim.dinosaure)
+        idle_animation = anim.DinoAnimation(self.display)
 
         while True:
             # Copie des données partagées
@@ -106,11 +100,12 @@ class DisplayThr(threading.Thread):
                         i = i + 1
             try:
                 if i == 0:
-                    display_idle(self.display)
+                    display_idle(self.display, idle_animation)
 
                 else:
                     # Tri de précaution, garantit stable
                     filt_list.sort(key=lambda tram: tram[1])
+                    self.display.set_cursor_at(0)
                     display_header(self.display, local_list[0].station)
                     if i == 1:
                         display_one_tramway(self.display, filt_list)
