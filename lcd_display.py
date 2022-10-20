@@ -22,7 +22,7 @@ def minutes_left(arrival_time):
 
 # A MODIFIER POUR ÉCRAN DIFFÉRENT
 def display_idle(display, animation):
-    display.clear()
+    #display.clear()
     animation.play(0.4)
 
 
