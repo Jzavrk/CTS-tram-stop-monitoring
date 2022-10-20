@@ -213,4 +213,5 @@ class DinoAnimation:
 
     def finish(self):
         self.display.entry_mode_set(cursor_inc=True)
+        self.display.return_home()
 
