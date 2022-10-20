@@ -175,36 +175,42 @@ class DinoAnimation:
         display.load_custom_chars(static_dinosaure)
 
     def step(self) -> None:
+        self.display.entry_mode_set(cursor_inc=True)
         self.display.load_single_custom_char(4, dinosaure_left_foot[self.frame_index])
         self.display.load_single_custom_char(5, dinosaure_right_foot[self.frame_index])
+        self.display.entry_mode_set(cursor_inc=False)
 
         self.frame_index ^= 1
         self.column_position = (self.column_position + 1) % self.MAX_COL_POSITION
 
-    def erase_trailing_char(self):
-        self.display.set_cursor_at(self.column_position)
-        self.display.write_char(ord(' '))
-        self.display.set_cursor_at(0x40 + self.column_position)
-        self.display.write_char(ord(' '))
-
     def draw_cells(self):
-        self.display.set_cursor_at(self.column_position)
-        for i in range(4):
+        self.display.set_cursor_at(self.column_position + 4)
+        for i in range(3, -1, -1):
             self.display.write_char(i)
 
-        self.display.set_cursor_at(0x40 + self.column_position)
-        for i in range(4, 7):
+        self.display.write_char(ord(' '))
+
+        self.display.set_cursor_at(0x40 + self.column_position + 3)
+        for i in range(6, 3, -1):
             self.display.write_char(i)
+
+        self.display.write_char(ord(' '))
 
     def prepare(self):
         for i in range(5):
             self.display.move_display_left()
 
+        self.display.entry_mode_set(cursor_inc=False)
+
     def play(self, delay):
+        self.prepare()
         for i in range(self.MAX_COL_POSITION):
-            self.erase_trailing_char()
             self.step()
             self.draw_cells()
             sleep(delay)
 
+        self.finish()
+
+    def finish(self):
+        self.display.entry_mode_set(cursor_inc=True)
 
