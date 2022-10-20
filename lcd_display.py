@@ -13,6 +13,7 @@ import rpi_i2c_lcd
 import shared_data
 import lcd_animations as anim
 
+REFRESH_TIME = 1    # Rafraîchit l'écran toutes les secondes
 
 def minutes_left(arrival_time):
     """Calcule des minutes restantes entre arrival_time et maintenant."""
@@ -61,18 +62,15 @@ class DisplayThr(threading.Thread):
         logger: objet de log
         shared: liste de données partagées
         stop_event: objet event pour signaler l'arrêt du script
-        seconds_per_frame: délai de rafraichissement de l'écran
     Argument en plus:
         i2c_addr: adresse du module i2c
         i2c_bus: bus i2c du rpi
     """
-    def __init__(self, shared, stop_event, seconds_per_frame, i2c_addr,
-            i2c_bus):
+    def __init__(self, shared, stop_event, i2c_addr, i2c_bus):
         threading.Thread.__init__(self)
         self.logger = logging.getLogger(__name__)
         self.shared = shared
         self.stop_event = stop_event
-        self.seconds_per_frame = seconds_per_frame
         try:
             self.display = rpi_i2c_lcd.LiquidCrystalI2C(i2c_addr, i2c_bus)
         except OSError:
@@ -125,6 +123,6 @@ class DisplayThr(threading.Thread):
                 self.stop_event.set()
                 break
 
-            if self.stop_event.wait(timeout=self.seconds_per_frame):
+            if self.stop_event.wait(timeout=REFRESH_TIME):
                 self.display.clear()
                 break
