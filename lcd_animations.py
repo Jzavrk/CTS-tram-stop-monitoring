@@ -170,7 +170,7 @@ class DinoAnimation:
         self.display = display
         self.frame_index = 0
         self.column_position = 0
-        self.MAX_COL_POSITION = 21
+        self.MAX_COL_POSITION = 25
 
         display.load_custom_chars(static_dinosaure)
 
