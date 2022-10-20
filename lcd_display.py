@@ -11,7 +11,9 @@ import logging
 import threading
 import rpi_i2c_lcd
 import shared_data
+import lcd_animations as anim
 
+REFRESH_TIME = 1    # Rafraîchit l'écran toutes les secondes
 
 def minutes_left(arrival_time):
     """Calcule des minutes restantes entre arrival_time et maintenant."""
@@ -19,10 +21,9 @@ def minutes_left(arrival_time):
 
 
 # A MODIFIER POUR ÉCRAN DIFFÉRENT
-def display_idle(display):
-    """Affichage d'un message d'attente."""
-    display.display_string("Fetching..." + " " * 5, 1)
-    display.display_string(" " * 16, 2)
+def display_idle(display, animation):
+    display.clear()
+    animation.play(0.4)
 
 
 # A MODIFIER POUR ÉCRAN DIFFÉRENT
@@ -54,18 +55,15 @@ class DisplayThr(threading.Thread):
         logger: objet de log
         shared: liste de données partagées
         stop_event: objet event pour signaler l'arrêt du script
-        seconds_per_frame: délai de rafraichissement de l'écran
     Argument en plus:
         i2c_addr: adresse du module i2c
         i2c_bus: bus i2c du rpi
     """
-    def __init__(self, shared, stop_event, seconds_per_frame, i2c_addr,
-            i2c_bus):
+    def __init__(self, shared, stop_event, i2c_addr, i2c_bus):
         threading.Thread.__init__(self)
         self.logger = logging.getLogger(__name__)
         self.shared = shared
         self.stop_event = stop_event
-        self.seconds_per_frame = seconds_per_frame
         try:
             self.display = rpi_i2c_lcd.LiquidCrystalI2C(i2c_addr, i2c_bus)
         except OSError:
@@ -78,6 +76,8 @@ class DisplayThr(threading.Thread):
         local_list = []
         shared_list = self.shared.list
         filt_list = [] # Tableau de tuples (nom_de_ligne, minutes_restantes)
+
+        idle_animation = anim.DinoAnimation(self.display)
 
         while True:
             # Copie des données partagées
@@ -99,11 +99,12 @@ class DisplayThr(threading.Thread):
                         i = i + 1
             try:
                 if i == 0:
-                    display_idle(self.display)
+                    display_idle(self.display, idle_animation)
 
                 else:
                     # Tri de précaution, garantit stable
                     filt_list.sort(key=lambda tram: tram[1])
+                    self.display.set_cursor_at(0)
                     display_header(self.display, local_list[0].station)
                     if i == 1:
                         display_one_tramway(self.display, filt_list)
@@ -116,6 +117,6 @@ class DisplayThr(threading.Thread):
                 self.stop_event.set()
                 break
 
-            if self.stop_event.wait(timeout=self.seconds_per_frame):
+            if self.stop_event.wait(timeout=REFRESH_TIME):
                 self.display.clear()
                 break

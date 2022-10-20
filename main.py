@@ -13,7 +13,6 @@ TOKEN = ''
 STATION_REF = ''
 I2C_ADDR = 0x3f
 I2C_BUS = 1
-SEC_PER_FRAM = 5
 LOGS = sys.argv[0] + '.log'
 
 stop_event = threading.Event()
@@ -38,8 +37,6 @@ def main():
             help='I2C module address (in hexadecimal)')
     parser.add_argument('-b', dest='bus', type=int, default=I2C_BUS,
             help='I2C bus (0 -- original Pi, 1 -- above versions)')
-    parser.add_argument('-r', dest='refresh', type=int, default=SEC_PER_FRAM,
-            help='screen refresh delay (in seconds)')
     parser.add_argument('-l', dest='log', default=LOGS,
             help='log specified location')
 
@@ -51,8 +48,7 @@ def main():
     shared_list = shared_data.SharedList()
     infos = infos_tram.InfosThr(shared_list, stop_event, args.station,
             args.token)
-    display = lcd_display.DisplayThr(shared_list, stop_event, args.refresh,
-            args.i2c, args.bus)
+    display = lcd_display.DisplayThr(shared_list, stop_event, args.i2c, args.bus)
 
     signal.signal(signal.SIGINT, sig_handler)
     signal.signal(signal.SIGTERM, sig_handler)

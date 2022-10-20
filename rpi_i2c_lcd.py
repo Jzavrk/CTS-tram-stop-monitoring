@@ -194,7 +194,7 @@ class LiquidCrystalI2C:
     def entry_mode_set(self, cursor_inc=None, display_move=None):
         """Control entry behaviour.
         Arguments:
-            cursor_inc: bool, increment cursor after printing character
+            cursor_inc: bool, increment cursor after printing character, false = decrement
             display_move: bool, make display move instead of cursor
         """
         if cursor_inc is not None:
@@ -233,3 +233,8 @@ class LiquidCrystalI2C:
         for char in fontdata:
             for line in char:
                 self.write_char(line)
+
+    def load_single_custom_char(self, index, fontdata):
+        self.write_cmd(SETCGRAMADDR | (index * 8))
+        for line in fontdata:
+            self.write_char(line)
