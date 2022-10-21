@@ -14,6 +14,7 @@ import shared_data
 import lcd_animations as anim
 
 REFRESH_TIME = 1    # Rafraîchit l'écran toutes les secondes
+ANIM_REFRESH_TIME = 0.35 # Pour l'animation
 
 def minutes_left(arrival_time):
     """Calcule des minutes restantes entre arrival_time et maintenant."""
@@ -22,8 +23,7 @@ def minutes_left(arrival_time):
 
 # A MODIFIER POUR ÉCRAN DIFFÉRENT
 def display_idle(display, animation):
-    #display.clear()
-    animation.play(0.4)
+    animation.play(ANIM_REFRESH_TIME)
 
 
 # A MODIFIER POUR ÉCRAN DIFFÉRENT
