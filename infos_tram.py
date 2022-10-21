@@ -14,11 +14,14 @@ import requests
 import shared_data
 
 MIN_DELAY = 8           # Temps minimum avant une nouvelle requête.
-FETCH_DELAY = 5 * 60 * 60   # Temps d'attente arbitraire si plus de tram.
 ATTEMPT_DELAY = 14      # Temps d'attente pour une requête non concluante.
 MAX_ATTEMPT = 4         # Nb d'essai avant exit
+WAKE_UP_HOUR = "05:00"  # Heure à laquel des requêtes sont refaite
     
 URL = "https://api.cts-strasbourg.eu/v1/siri/2.0/stop-monitoring"
+
+def seconds_left(future):
+    return timedelta.total_seconds(future - datetime.now())
 
 
 class InfosThr(threading.Thread):
@@ -89,8 +92,8 @@ class InfosThr(threading.Thread):
                     ['ValidUntil']), flags=re.ASCII)
 
             # Secondes restantes pour une nouvelle requête
-            valid_cntdown = timedelta.total_seconds(datetime.strptime(
-                    valid_until_str, '%Y-%m-%dT%H:%M:%S') - datetime.now())
+            valid_cntdown = seconds_left(datetime.strptime(valid_until_str,
+                '%Y-%m-%dT%H:%M:%S'))
 
             # Tableau comprenant noms de ligne et heures d'arrivées.
             # Si une exception est levée, plus aucun tram n'est
@@ -99,9 +102,10 @@ class InfosThr(threading.Thread):
                 tram_infos = (data['ServiceDelivery']['StopMonitoringDelivery']
                     [0]['MonitoredStopVisit'])
             except KeyError:
+                sec_to_wakeup = seconds_left(datetime.strptime(WAKE_UP_HOUR, "%H:%M"))
                 self.logger.warning('End of arrivals. Waiting %d seconds.',
-                        FETCH_DELAY)
-                if self.stop_event.wait(timeout=FETCH_DELAY):
+                        sec_to_wakeup)
+                if self.stop_event.wait(timeout=sec_to_wakeup):
                     break
                 continue
 
