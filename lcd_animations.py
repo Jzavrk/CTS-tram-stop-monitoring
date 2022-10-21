@@ -170,7 +170,7 @@ class DinoAnimation:
         self.display = display
         self.frame_index = 0
         self.column_position = 0
-        self.MAX_COL_POSITION = 25
+        self.MAX_COL_POSITION = 22
 
         display.load_custom_chars(static_dinosaure)
 
@@ -184,22 +184,19 @@ class DinoAnimation:
         self.column_position = (self.column_position + 1) % self.MAX_COL_POSITION
 
     def draw_cells(self):
-        self.display.set_cursor_at(self.column_position + 4)
+        self.display.set_cursor_at(self.column_position)
         for i in range(3, -1, -1):
             self.display.write_char(i)
 
         self.display.write_char(ord(' '))
 
-        self.display.set_cursor_at(0x40 + self.column_position + 3)
+        self.display.set_cursor_at(0x40 + self.column_position - 1)
         for i in range(6, 3, -1):
             self.display.write_char(i)
 
         self.display.write_char(ord(' '))
 
     def prepare(self):
-        for i in range(5):
-            self.display.move_display_left()
-
         self.display.entry_mode_set(cursor_inc=False)
 
     def play(self, delay):
@@ -213,5 +210,4 @@ class DinoAnimation:
 
     def finish(self):
         self.display.entry_mode_set(cursor_inc=True)
-        self.display.return_home()
 
