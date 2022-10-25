@@ -13,10 +13,10 @@ import re
 import requests
 import shared_data
 
-MIN_DELAY = 8           # Temps minimum avant une nouvelle requête.
+MIN_DELAY = 30          # Temps minimum avant une nouvelle requête.
 ATTEMPT_DELAY = 14      # Temps d'attente pour une requête non concluante.
-MAX_ATTEMPT = 4         # Nb d'essai avant exit
-WAKE_UP_HOUR = "05:00"  # Heure à laquel des requêtes sont refaite
+MAX_ATTEMPT = 2         # Nb d'essai avant exit
+WAKE_UP_HOUR = "05:45"  # Heure à laquel des requêtes sont refaite
     
 URL = "https://api.cts-strasbourg.eu/v1/siri/2.0/stop-monitoring"
 
