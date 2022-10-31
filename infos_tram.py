@@ -13,10 +13,10 @@ import re
 import requests
 import shared_data
 
-MIN_DELAY = 30          # Temps minimum avant une nouvelle requête.
-ATTEMPT_DELAY = 14      # Temps d'attente pour une requête non concluante.
-MAX_ATTEMPT = 2         # Nb d'essai avant exit
-WAKE_UP_HOUR = "05:45"  # Heure à laquel des requêtes sont refaite
+MIN_DELAY = 30              # Temps minimum avant une nouvelle requête.
+ATTEMPT_DELAY = 14          # Temps d'attente pour une requête non concluante.
+MAX_ATTEMPT = 2             # Nb d'essai avant exit
+SEC_TO_WAKEUP = 5 * 60 * 60 # Temps d'attente si plus de tram
     
 URL = "https://api.cts-strasbourg.eu/v1/siri/2.0/stop-monitoring"
 
@@ -102,10 +102,9 @@ class InfosThr(threading.Thread):
                 tram_infos = (data['ServiceDelivery']['StopMonitoringDelivery']
                     [0]['MonitoredStopVisit'])
             except KeyError:
-                sec_to_wakeup = seconds_left(datetime.strptime(WAKE_UP_HOUR, "%H:%M"))
                 self.logger.warning('End of arrivals. Waiting %d seconds.',
-                        sec_to_wakeup)
-                if self.stop_event.wait(timeout=sec_to_wakeup):
+                        SEC_TO_WAKEUP)
+                if self.stop_event.wait(timeout=SEC_TO_WAKEUP):
                     break
                 continue
 
