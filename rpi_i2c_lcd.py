@@ -101,10 +101,14 @@ class LiquidCrystalI2C:
         self.write_cmd(ENTRYMODESET | ENTRYINC)
         sleep(0.2)
 
+    def __del__(self):
+        self.clear()
+        self.bus.close()
+
     def write_byte(self, data):
         """Write 8 bits of data to i2c module."""
         self.bus.write_byte(self.addr, data)
-        sleep(0.0001)
+        sleep(0.0003)
 
     def write_nibble(self, data):
         """Input 4 bits to lcd."""
@@ -115,9 +119,7 @@ class LiquidCrystalI2C:
     def strobe(self, data):
         """Confirm data input to lcd."""
         self.write_byte(data | EN | (BACKLIGHT if self.bkl else NOBACKLIGHT))
-        sleep(.0005)
         self.write_byte((data & ~EN) | (BACKLIGHT if self.bkl else NOBACKLIGHT))
-        sleep(.0001)
 
     def write_cmd(self, cmd, flags=0x0):
         """Write a command to lcd."""
@@ -194,7 +196,7 @@ class LiquidCrystalI2C:
     def entry_mode_set(self, cursor_inc=None, display_move=None):
         """Control entry behaviour.
         Arguments:
-            cursor_inc: bool, increment cursor after printing character, false = decrement
+            cursor_inc: bool, increment cursor after printing character
             display_move: bool, make display move instead of cursor
         """
         if cursor_inc is not None:
@@ -233,7 +235,7 @@ class LiquidCrystalI2C:
         for char in fontdata:
             for line in char:
                 self.write_char(line)
-
+                
     def load_single_custom_char(self, index, fontdata):
         self.write_cmd(SETCGRAMADDR | (index * 8))
         for line in fontdata:

@@ -118,5 +118,4 @@ class DisplayThr(threading.Thread):
                 break
 
             if self.stop_event.wait(timeout=REFRESH_TIME):
-                self.display.clear()
                 break
