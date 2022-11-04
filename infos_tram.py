@@ -70,7 +70,7 @@ class InfosThr(threading.Thread):
                 if self.stop_event.wait(timeout=MIN_DELAY):
                     break
 
-            # Si erreur, alors retentative jusqu'à 5 fois.
+            # Si erreur, alors retentative jusqu'à MAX_ATTEMPT fois.
             except requests.exceptions.ConnectionError:
                 self.logger.exception('Connection error. Attempt %d.', req_try,
                         exc_info=False)

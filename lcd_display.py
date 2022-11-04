@@ -22,11 +22,6 @@ def minutes_left(arrival_time):
 
 
 # A MODIFIER POUR ÉCRAN DIFFÉRENT
-def display_idle(display, animation):
-    animation.play(ANIM_REFRESH_TIME)
-
-
-# A MODIFIER POUR ÉCRAN DIFFÉRENT
 def display_header(display, station_name):
     """Affichage nom de station et heure."""
     display.display_string("{:10.10} {:%H:%M}".format(
@@ -98,8 +93,12 @@ class DisplayThr(threading.Thread):
                     finally:
                         i = i + 1
             try:
+                # Nothing to disclose, idle
                 if i == 0:
-                    display_idle(self.display, idle_animation)
+                    # Frames drawned by iterator
+                    for _ in idle_animation:
+                        if self.stop_event.wait(timeout=ANIM_REFRESH_TIME):
+                            break
 
                 else:
                     # Tri de précaution, garantit stable
