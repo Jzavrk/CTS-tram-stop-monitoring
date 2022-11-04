@@ -40,6 +40,7 @@ class DinoAnimation:
         return self
 
     def __next__(self):
+        self.cur_position += 1
         if self.cur_position % self.MAX_COL_POSITION == 0:
             self.display.entry_mode_set(cursor_inc=True)
             raise StopIteration
@@ -47,7 +48,6 @@ class DinoAnimation:
         self.display.entry_mode_set(cursor_inc=False)
         self._step()
         self._draw_cells()
-        self.cur_position += 1
         self.display.entry_mode_set(cursor_inc=True)
 
     def _step(self) -> None:
