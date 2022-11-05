@@ -33,22 +33,23 @@ class DinoAnimation:
         self.display = display
         self.frame_index = 0
         self.cur_position = 0
-        self.MAX_COL_POSITION = 22
+        self.MAX_COL_POSITION = 20
         display.load_custom_chars(static_dinosaure)
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        self.cur_position = (self.cur_position + 1) % self.MAX_COL_POSITION
-        if self.cur_position == 0:
+        if self.cur_position == self.MAX_COL_POSITION:
             self.display.entry_mode_set(cursor_inc=True)
+            self.cur_position = 0
             raise StopIteration
 
         self.display.entry_mode_set(cursor_inc=False)
         self._step()
         self._draw_cells()
         self.display.entry_mode_set(cursor_inc=True)
+        self.cur_position += 1
 
     def _step(self) -> None:
         self.display.entry_mode_set(cursor_inc=True)
